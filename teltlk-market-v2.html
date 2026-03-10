@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TELTLK 市集大厅</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0A0A0F;
+    --bg-elevated: #13131A;
+    --bg-card: #1A1A24;
+    --bg-input: #0F0F17;
+    --text-1: #F0F0F5;
+    --text-2: #6E7186;
+    --text-3: #3D3F50;
+    --green: #00DC82;
+    --green-dim: rgba(0,220,130,0.08);
+    --green-glow: rgba(0,220,130,0.2);
+    --red: #FF4D6A;
+    --red-dim: rgba(255,77,106,0.08);
+    --blue: #3B7BF7;
+    --blue-dim: rgba(59,123,247,0.1);
+    --amber: #FFB547;
+    --border: rgba(255,255,255,0.06);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'Noto Sans SC', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text-1);
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ========== STATUS BAR ========== */
+  .status-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 24px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; font-weight: 600;
+  }
+
+  /* ========== HEADER ========== */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    padding: 10px 20px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+  }
+  .header-title {
+    font-size: 20px; font-weight: 700; letter-spacing: -0.3px;
+  }
+  .header-title span { color: var(--text-2); font-size: 13px; font-weight: 400; margin-left: 6px; }
+  .gas-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    color: var(--green);
+    background: var(--green-dim);
+    border: 1px solid rgba(0,220,130,0.15);
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .gas-badge::before {
+    content: ''; width: 5px; height: 5px;
+    background: var(--green); border-radius: 50%;
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 0; padding-bottom: 0;
+    position: relative;
+  }
+  .tab {
+    flex: 1; text-align: center;
+    padding: 10px 0 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; font-weight: 600;
+    color: var(--text-2);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+  }
+  .tab.active { color: var(--text-1); }
+  .tab.active::after {
+    content: ''; position: absolute;
+    bottom: 0; left: 20%; width: 60%; height: 2px;
+    background: var(--green);
+    border-radius: 1px;
+    box-shadow: 0 0 8px var(--green-glow);
+  }
+  .tab .price-hint {
+    display: block; font-size: 10px; font-weight: 400;
+    color: var(--text-3); margin-top: 2px;
+  }
+  .tab.active .price-hint { color: var(--text-2); }
+
+  /* ========== MARKET LIST ========== */
+  .market-list { padding: 12px 16px 100px; }
+
+  .order-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+    transition: transform 0.2s, border-color 0.2s;
+    cursor: pointer;
+    animation: cardIn 0.35s ease backwards;
+  }
+  .order-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.1);
+  }
+  .order-card:nth-child(1) { animation-delay: 0.05s; }
+  .order-card:nth-child(2) { animation-delay: 0.1s; }
+  .order-card:nth-child(3) { animation-delay: 0.15s; }
+  .order-card:nth-child(4) { animation-delay: 0.2s; }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .seller-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .avatar {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .seller-meta { display: flex; flex-direction: column; }
+  .seller-name {
+    font-size: 13px; font-weight: 600; color: var(--text-1);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .badge-friend {
+    font-size: 9px; font-weight: 700;
+    color: var(--blue); background: var(--blue-dim);
+    padding: 1px 5px; border-radius: 4px;
+    letter-spacing: 0.3px;
+  }
+  .seller-stats {
+    font-size: 11px; color: var(--text-3);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 2px;
+  }
+  .order-time {
+    font-size: 11px; color: var(--text-3);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .card-body {
+    display: flex; justify-content: space-between; align-items: flex-end;
+  }
+  .amount-block {}
+  .amount-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 26px; font-weight: 700; color: var(--text-1);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .amount-unit {
+    font-size: 12px; font-weight: 600;
+    color: var(--text-2);
+    background: rgba(255,255,255,0.05);
+    padding: 2px 6px; border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .amount-usd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--text-3); margin-top: 4px;
+    display: block;
+  }
+
+  .price-buy { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .unit-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text-2);
+  }
+  .unit-price em {
+    font-style: normal; color: var(--text-1); font-weight: 600;
+  }
+  .btn-buy {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--green);
+    color: #0A0A0F;
+    border: none; padding: 9px 24px;
+    border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 2px 10px var(--green-glow);
+  }
+  .btn-buy:hover { box-shadow: 0 4px 20px var(--green-glow); transform: translateY(-1px); }
+  .btn-buy:active { transform: scale(0.97); }
+
+  /* ========== FAB ========== */
+  .fab {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--blue), #5B95FF);
+    color: white; padding: 14px 36px;
+    border-radius: 50px; border: none;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; z-index: 200;
+    box-shadow: 0 4px 24px rgba(59,123,247,0.35);
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .fab:hover { box-shadow: 0 6px 30px rgba(59,123,247,0.5); transform: translateX(-50%) translateY(-2px); }
+  .fab:active { transform: translateX(-50%) scale(0.97); }
+
+  /* ========== OVERLAYS ========== */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 300;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .overlay.show { opacity: 1; pointer-events: auto; }
+
+  /* ========== BOTTOM SHEET ========== */
+  .sheet {
+    position: fixed; bottom: 0; left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    width: 100%; max-width: 430px;
+    background: var(--bg-elevated);
+    border-radius: 20px 20px 0 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    padding: 20px 20px 36px;
+    z-index: 301;
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .sheet.show { transform: translateX(-50%) translateY(0); }
+
+  .sheet-handle {
+    width: 36px; height: 4px;
+    background: var(--text-3); border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .sheet-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+  }
+  .sheet-title { font-size: 18px; font-weight: 700; }
+  .sheet-close {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%; border: none;
+    color: var(--text-2); font-size: 18px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .sheet-close:hover { background: rgba(255,255,255,0.1); }
+
+  .field { margin-bottom: 16px; }
+  .field-label {
+    font-size: 12px; color: var(--text-2);
+    margin-bottom: 8px; display: flex;
+    justify-content: space-between; align-items: center;
+  }
+  .field-balance { color: var(--green); font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+  .field-input {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 8px;
+    transition: border-color 0.2s;
+  }
+  .field-input:focus-within { border-color: rgba(59,123,247,0.4); }
+  .field-input input {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--text-1);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px; font-weight: 600;
+  }
+  .field-input input::placeholder { color: var(--text-3); }
+  .btn-max {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    color: var(--blue); background: var(--blue-dim);
+    border: none; padding: 4px 10px;
+    border-radius: 6px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-max:hover { background: rgba(59,123,247,0.2); }
+  .field-hint {
+    font-size: 11px; color: var(--text-3);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 6px;
+    display: flex; gap: 12px;
+  }
+
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .summary-label { font-size: 13px; color: var(--text-2); }
+  .summary-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px; font-weight: 700;
+    color: var(--green);
+  }
+  .summary-fee {
+    font-size: 11px; color: var(--text-3);
+    font-family: 'JetBrains Mono', monospace;
+    text-align: right; margin-top: 2px;
+  }
+
+  .btn-submit {
+    width: 100%; padding: 16px;
+    border: none; border-radius: 12px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer; margin-top: 16px;
+    transition: all 0.2s;
+  }
+  .btn-submit.sell {
+    background: var(--red); color: white;
+    box-shadow: 0 4px 16px rgba(255,77,106,0.25);
+  }
+  .btn-submit.sell:hover { box-shadow: 0 6px 24px rgba(255,77,106,0.35); }
+  .btn-submit.buy-confirm {
+    background: var(--green); color: #0A0A0F;
+    box-shadow: 0 4px 16px var(--green-glow);
+  }
+
+  /* share to chat toggle */
+  .share-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; margin-bottom: 4px;
+  }
+  .share-toggle-text {
+    font-size: 13px; color: var(--text-2);
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .share-toggle-text small { font-size: 11px; color: var(--text-3); }
+  .toggle-switch {
+    width: 44px; height: 24px;
+    background: var(--text-3);
+    border-radius: 12px; position: relative;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .toggle-switch.on { background: var(--green); }
+  .toggle-switch::after {
+    content: ''; position: absolute;
+    width: 20px; height: 20px;
+    background: white; border-radius: 50%;
+    top: 2px; left: 2px;
+    transition: transform 0.2s;
+  }
+  .toggle-switch.on::after { transform: translateX(20px); }
+
+  /* ========== BUY CONFIRM SHEET ========== */
+  .confirm-info { margin-bottom: 16px; }
+  .confirm-row {
+    display: flex; justify-content: space-between;
+    padding: 10px 0;
+    font-size: 13px;
+  }
+  .confirm-row .label { color: var(--text-2); }
+  .confirm-row .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600; color: var(--text-1);
+  }
+  .confirm-total {
+    border-top: 1px solid var(--border);
+    padding-top: 12px; margin-top: 4px;
+  }
+  .confirm-total .value { font-size: 20px; color: var(--green); }
+
+  .warning-box {
+    background: rgba(255,181,71,0.08);
+    border: 1px solid rgba(255,181,71,0.15);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .warning-box .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .warning-box .msg {
+    font-size: 12px; color: var(--amber);
+    line-height: 1.5;
+  }
+
+  /* ========== SUCCESS TOAST ========== */
+  .toast {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: var(--bg-elevated);
+    border: 1px solid var(--green);
+    border-radius: 12px;
+    padding: 14px 24px;
+    z-index: 400;
+    display: flex; align-items: center; gap: 10px;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s;
+    box-shadow: 0 8px 30px rgba(0,220,130,0.15);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+  .toast .icon { font-size: 20px; }
+  .toast .msg { font-size: 14px; font-weight: 600; }
+
+  /* ========== WALLET PROMPT ========== */
+  .wallet-prompt {
+    text-align: center;
+    padding: 20px 0 10px;
+  }
+  .wallet-prompt .icon { font-size: 40px; margin-bottom: 12px; }
+  .wallet-prompt p { font-size: 14px; color: var(--text-2); margin-bottom: 16px; line-height: 1.5; }
+  .btn-wallet {
+    background: var(--blue); color: white;
+    border: none; padding: 14px 32px;
+    border-radius: 12px; font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Status Bar -->
+<div class="status-bar">
+  <span>9:41</span>
+  <div style="display:flex;gap:6px;align-items:center;">
+    <svg width="17" height="12" viewBox="0 0 17 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1" opacity="0.3"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity="0.5"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" opacity="0.7"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="white" stroke-width="1.3"><path d="M1 8.5a10 10 0 0114 0" opacity="0.3"/><path d="M3.5 6.5a7 7 0 019 0" opacity="0.6"/><path d="M6 9a3.5 3.5 0 014 0"/><circle cx="8" cy="11" r="1" fill="white" stroke="none"/></svg>
+    <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="22" height="12" rx="3" stroke="white" opacity="0.35"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#00DC82"/><path d="M24 4.5v4" stroke="white" opacity="0.35" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-top">
+    <div class="header-title">市集大厅 <span>C2C</span></div>
+    <div class="gas-badge">0 Gas 免手续费</div>
+  </div>
+  <div class="tabs" id="tabBar">
+    <div class="tab active" onclick="switchTab(this)">ORDI<span class="price-hint">$35.20</span></div>
+    <div class="tab" onclick="switchTab(this)">SATS<span class="price-hint">$0.00042</span></div>
+    <div class="tab" onclick="switchTab(this)">RATS<span class="price-hint">$0.12</span></div>
+    <div class="tab" onclick="switchTab(this)">PIZA<span class="price-hint">$0.08</span></div>
+  </div>
+</div>
+
+<!-- Market List -->
+<div class="market-list" id="marketList">
+
+  <div class="order-card" onclick="openBuySheet(this)" data-seller="Crypto_王大拿" data-amount="100" data-unit="ORDI" data-price="35.00" data-total="3,500.00">
+    <div class="card-top">
+      <div class="seller-row">
+        <div class="avatar" style="background:linear-gradient(135deg,#FF6B6B,#FF8E53);">🐂</div>
+        <div class="seller-meta">
+          <div class="seller-name">Crypto_王大拿</div>
+          <div class="seller-stats">成交 128 单 · 好评 99%</div>
+        </div>
+      </div>
+      <div class="order-time">3 分钟前</div>
+    </div>
+    <div class="card-body">
+      <div class="amount-block">
+        <div><span class="amount-value">100</span><span class="amount-unit">ORDI</span></div>
+        <span class="amount-usd">≈ $3,500.00</span>
+      </div>
+      <div class="price-buy">
+        <div class="unit-price">单价 <em>$35.00</em></div>
+        <button class="btn-buy" onclick="event.stopPropagation();openBuySheet(this.closest('.order-card'))">购买</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="order-card" onclick="openBuySheet(this)" data-seller="小红帽" data-amount="5" data-unit="ORDI" data-price="34.50" data-total="172.50" data-friend="true">
+    <div class="card-top">
+      <div class="seller-row">
+        <div class="avatar" style="background:linear-gradient(135deg,#A78BFA,#F0ABFC);">🎀</div>
+        <div class="seller-meta">
+          <div class="seller-name">小红帽 <span class="badge-friend">群友</span></div>
+          <div class="seller-stats">成交 12 单 · 好评 100%</div>
+        </div>
+      </div>
+      <div class="order-time">8 分钟前</div>
+    </div>
+    <div class="card-body">
+      <div class="amount-block">
+        <div><span class="amount-value">5</span><span class="amount-unit">ORDI</span></div>
+        <span class="amount-usd">≈ $172.50</span>
+      </div>
+      <div class="price-buy">
+        <div class="unit-price">单价 <em>$34.50</em></div>
+        <button class="btn-buy" onclick="event.stopPropagation();openBuySheet(this.closest('.order-card'))">购买</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="order-card" onclick="openBuySheet(this)" data-seller="Satoshi粉丝" data-amount="50" data-unit="ORDI" data-price="36.00" data-total="1,800.00">
+    <div class="card-top">
+      <div class="seller-row">
+        <div class="avatar" style="background:linear-gradient(135deg,#34D399,#60A5FA);">⚡</div>
+        <div class="seller-meta">
+          <div class="seller-name">Satoshi粉丝</div>
+          <div class="seller-stats">成交 67 单 · 好评 97%</div>
+        </div>
+      </div>
+      <div class="order-time">15 分钟前</div>
+    </div>
+    <div class="card-body">
+      <div class="amount-block">
+        <div><span class="amount-value">50</span><span class="amount-unit">ORDI</span></div>
+        <span class="amount-usd">≈ $1,800.00</span>
+      </div>
+      <div class="price-buy">
+        <div class="unit-price">单价 <em>$36.00</em></div>
+        <button class="btn-buy" onclick="event.stopPropagation();openBuySheet(this.closest('.order-card'))">购买</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="order-card" onclick="openBuySheet(this)" data-seller="DeFi老司机" data-amount="200" data-unit="ORDI" data-price="34.80" data-total="6,960.00">
+    <div class="card-top">
+      <div class="seller-row">
+        <div class="avatar" style="background:linear-gradient(135deg,#FBBF24,#F97316);">🔥</div>
+        <div class="seller-meta">
+          <div class="seller-name">DeFi老司机</div>
+          <div class="seller-stats">成交 342 单 · 好评 98%</div>
+        </div>
+      </div>
+      <div class="order-time">22 分钟前</div>
+    </div>
+    <div class="card-body">
+      <div class="amount-block">
+        <div><span class="amount-value">200</span><span class="amount-unit">ORDI</span></div>
+        <span class="amount-usd">≈ $6,960.00</span>
+      </div>
+      <div class="price-buy">
+        <div class="unit-price">单价 <em>$34.80</em></div>
+        <button class="btn-buy" onclick="event.stopPropagation();openBuySheet(this.closest('.order-card'))">购买</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FAB: Sell -->
+<button class="fab" onclick="openSellSheet()">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>
+  我要卖币
+</button>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- ========== SELL SHEET ========== -->
+<div class="sheet" id="sellSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title">上架出售 ORDI</div>
+    <button class="sheet-close" onclick="closeAll()">✕</button>
+  </div>
+
+  <div class="field">
+    <div class="field-label">
+      <span>出售数量</span>
+      <span class="field-balance">可用 120 ORDI（冻结 30）</span>
+    </div>
+    <div class="field-input">
+      <input type="number" placeholder="0" id="sellAmount" oninput="calcSell()">
+      <button class="btn-max" onclick="document.getElementById('sellAmount').value=120;calcSell()">MAX</button>
+    </div>
+    <div class="field-hint"><span>最小挂单: 1 ORDI</span></div>
+  </div>
+
+  <div class="field">
+    <div class="field-label"><span>单价 (USDT)</span></div>
+    <div class="field-input">
+      <input type="number" value="35.20" id="sellPrice" oninput="calcSell()">
+      <span style="font-size:12px;color:var(--text-3)">USDT</span>
+    </div>
+    <div class="field-hint">
+      <span>市价 $35.20</span>
+      <span>允许范围 $28.16 - $42.24 (±20%)</span>
+    </div>
+  </div>
+
+  <div class="share-toggle">
+    <div class="share-toggle-text">
+      同步到群聊
+      <small>挂单信息将发送到「ORDI交易群」</small>
+    </div>
+    <div class="toggle-switch on" id="shareToggle" onclick="this.classList.toggle('on')"></div>
+  </div>
+
+  <div class="summary-row">
+    <span class="summary-label">预计收入</span>
+    <div style="text-align:right">
+      <div class="summary-value" id="sellTotal">0.00 USDT</div>
+      <div class="summary-fee" id="sellFee">手续费(1%): 0.00</div>
+    </div>
+  </div>
+
+  <button class="btn-submit sell" onclick="confirmSell()">立即挂单</button>
+</div>
+
+<!-- ========== BUY CONFIRM SHEET ========== -->
+<div class="sheet" id="buySheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title">确认购买</div>
+    <button class="sheet-close" onclick="closeAll()">✕</button>
+  </div>
+
+  <div class="confirm-info">
+    <div class="confirm-row">
+      <span class="label">卖家</span>
+      <span class="value" id="buySeller">—</span>
+    </div>
+    <div class="confirm-row">
+      <span class="label">数量</span>
+      <span class="value" id="buyAmount">—</span>
+    </div>
+    <div class="confirm-row">
+      <span class="label">单价</span>
+      <span class="value" id="buyPrice">—</span>
+    </div>
+    <div class="confirm-row confirm-total">
+      <span class="label">支付总额</span>
+      <span class="value" id="buyTotal" style="color:var(--green)">—</span>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <span class="icon">⚠️</span>
+    <span class="msg">点击确认后，订单将锁定 15 分钟。期间卖家无法撤单，请在限时内完成支付。超时未支付订单将自动取消。</span>
+  </div>
+
+  <button class="btn-submit buy-confirm" onclick="confirmBuy()">确认购买 · 锁定订单</button>
+</div>
+
+<!-- ========== WALLET PROMPT SHEET ========== -->
+<div class="sheet" id="walletSheet">
+  <div class="sheet-handle"></div>
+  <div class="wallet-prompt">
+    <div class="icon">🔐</div>
+    <p>交易前需要先创建或导入钱包<br>仅需 30 秒即可完成设置</p>
+    <button class="btn-wallet" onclick="closeAll()">创建钱包</button>
+    <div style="margin-top:12px">
+      <span style="font-size:13px;color:var(--blue);cursor:pointer">已有钱包？导入助记词 →</span>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="icon">✅</span>
+  <span class="msg" id="toastMsg">挂单成功</span>
+</div>
+
+<script>
+  // Tab switch
+  function switchTab(el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    // re-animate cards
+    document.querySelectorAll('.order-card').forEach((c, i) => {
+      c.style.animation = 'none';
+      c.offsetHeight;
+      c.style.animation = `cardIn 0.3s ease backwards ${0.05 * i}s`;
+    });
+  }
+
+  // Sell sheet
+  function openSellSheet() {
+    showSheet('sellSheet');
+  }
+
+  function calcSell() {
+    const amt = parseFloat(document.getElementById('sellAmount').value) || 0;
+    const price = parseFloat(document.getElementById('sellPrice').value) || 0;
+    const fee = amt * price * 0.01;
+    const total = amt * price - fee;
+    document.getElementById('sellTotal').textContent = total.toFixed(2) + ' USDT';
+    document.getElementById('sellFee').textContent = '手续费(1%): ' + fee.toFixed(2);
+
+    // Price range validation visual feedback
+    const priceInput = document.getElementById('sellPrice');
+    const parent = priceInput.closest('.field-input');
+    if (price > 42.24 || price < 28.16) {
+      parent.style.borderColor = 'var(--red)';
+    } else {
+      parent.style.borderColor = '';
+    }
+
+    // Amount validation
+    const amtInput = document.getElementById('sellAmount');
+    const amtParent = amtInput.closest('.field-input');
+    if (amt > 120) {
+      amtParent.style.borderColor = 'var(--red)';
+    } else {
+      amtParent.style.borderColor = '';
+    }
+  }
+
+  function confirmSell() {
+    const amt = parseFloat(document.getElementById('sellAmount').value) || 0;
+    const price = parseFloat(document.getElementById('sellPrice').value) || 0;
+
+    if (amt <= 0) { shakeField('sellAmount'); return; }
+    if (amt > 120) { showToast('❌ 超出可用余额'); return; }
+    if (price < 28.16 || price > 42.24) { showToast('❌ 价格超出允许范围 (±20%)'); return; }
+
+    closeAll();
+    const shareOn = document.getElementById('shareToggle').classList.contains('on');
+    const msg = shareOn ? '挂单成功！已同步到群聊' : '挂单成功！';
+    showToast('✅ ' + msg);
+  }
+
+  // Buy sheet
+  function openBuySheet(card) {
+    // Simulate: check if wallet exists (demo: 50% chance no wallet)
+    const hasWallet = true; // set false to test wallet prompt
+    if (!hasWallet) {
+      showSheet('walletSheet');
+      return;
+    }
+
+    const seller = card.dataset.seller;
+    const amount = card.dataset.amount;
+    const unit = card.dataset.unit;
+    const price = card.dataset.price;
+    const total = card.dataset.total;
+
+    document.getElementById('buySeller').textContent = seller;
+    document.getElementById('buyAmount').textContent = amount + ' ' + unit;
+    document.getElementById('buyPrice').textContent = '$' + price;
+    document.getElementById('buyTotal').textContent = '$ ' + total;
+
+    showSheet('buySheet');
+  }
+
+  function confirmBuy() {
+    closeAll();
+    showToast('✅ 订单已锁定，请在 15 分钟内支付');
+  }
+
+  // Sheet management
+  function showSheet(id) {
+    document.getElementById('overlay').classList.add('show');
+    document.getElementById(id).classList.add('show');
+  }
+
+  function closeAll() {
+    document.getElementById('overlay').classList.remove('show');
+    document.querySelectorAll('.sheet').forEach(s => s.classList.remove('show'));
+  }
+
+  // Toast
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg.replace(/^[✅❌]\s*/, '');
+    t.querySelector('.icon').textContent = msg.startsWith('❌') ? '❌' : '✅';
+    if (msg.startsWith('❌')) {
+      t.style.borderColor = 'var(--red)';
+      t.style.boxShadow = '0 8px 30px rgba(255,77,106,0.15)';
+    } else {
+      t.style.borderColor = 'var(--green)';
+      t.style.boxShadow = '0 8px 30px rgba(0,220,130,0.15)';
+    }
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // Shake animation for validation
+  function shakeField(inputId) {
+    const el = document.getElementById(inputId).closest('.field-input');
+    el.style.borderColor = 'var(--red)';
+    el.style.animation = 'shake 0.4s ease';
+    setTimeout(() => { el.style.animation = ''; el.style.borderColor = ''; }, 500);
+  }
+
+  // Add shake keyframe
+  const style = document.createElement('style');
+  style.textContent = `@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }`;
+  document.head.appendChild(style);
+</script>
+
+</body>
+</html>
