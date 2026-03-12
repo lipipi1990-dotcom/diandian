@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🦞 Lobster Protocol - My Lobster's Home</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a1a;
+    color: #e0e0e0;
+    font-family: 'Orbitron', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .header {
+    text-align: center;
+    padding: 30px 20px 10px;
+    position: relative;
+  }
+
+  .header h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 18px;
+    color: #00e5ff;
+    text-shadow: 0 0 10px #00e5ff, 0 0 30px #00e5ff44;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  .header .subtitle {
+    font-size: 10px;
+    color: #ff1493;
+    text-shadow: 0 0 8px #ff149366;
+    letter-spacing: 2px;
+  }
+
+  /* Main pixel art container */
+  .room-wrapper {
+    position: relative;
+    margin: 20px auto;
+    width: 512px;
+    height: 384px;
+    border: 3px solid #00e5ff33;
+    box-shadow: 0 0 20px #00e5ff22, inset 0 0 20px #00000088;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    overflow: hidden;
+    border-radius: 4px;
+  }
+
+  canvas#roomCanvas {
+    width: 512px;
+    height: 384px;
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  /* Status panel */
+  .status-panel {
+    width: 512px;
+    margin: 0 auto;
+    display: flex;
+    gap: 12px;
+    padding: 15px 0;
+  }
+
+  .stat-box {
+    flex: 1;
+    background: #111128;
+    border: 1px solid #1a1a3e;
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .stat-box .label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: #666;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+
+  .stat-box .value {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    color: #00e5ff;
+    text-shadow: 0 0 6px #00e5ff44;
+  }
+
+  .stat-box .value.pink { color: #ff1493; text-shadow: 0 0 6px #ff149344; }
+  .stat-box .value.green { color: #39ff14; text-shadow: 0 0 6px #39ff1444; }
+  .stat-box .value.orange { color: #ff6b35; text-shadow: 0 0 6px #ff6b3544; }
+
+  /* Controls */
+  .controls {
+    width: 512px;
+    margin: 0 auto;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-bottom: 10px;
+  }
+
+  .ctrl-btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    padding: 10px 16px;
+    border: 1px solid #333;
+    background: #111128;
+    color: #888;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+  }
+
+  .ctrl-btn:hover {
+    border-color: #00e5ff;
+    color: #00e5ff;
+    box-shadow: 0 0 10px #00e5ff33;
+  }
+
+  .ctrl-btn.active {
+    border-color: #00e5ff;
+    color: #00e5ff;
+    background: #0a1a2e;
+    box-shadow: 0 0 10px #00e5ff33;
+  }
+
+  /* Log */
+  .log-panel {
+    width: 512px;
+    margin: 10px auto 30px;
+    background: #0a0a14;
+    border: 1px solid #1a1a2e;
+    border-radius: 4px;
+    padding: 12px;
+    max-height: 120px;
+    overflow-y: auto;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    line-height: 1.8;
+  }
+
+  .log-entry {
+    color: #444;
+    margin-bottom: 2px;
+  }
+  .log-entry .time { color: #333; }
+  .log-entry .msg { color: #00e5ff88; }
+  .log-entry .msg.pink { color: #ff149388; }
+  .log-entry .msg.green { color: #39ff1488; }
+
+  /* Neon flicker */
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.8; }
+    97% { opacity: 1; }
+    98% { opacity: 0.6; }
+    99% { opacity: 0.9; }
+  }
+
+  .header h1 { animation: flicker 4s infinite; }
+
+  /* Mobile */
+  @media (max-width: 540px) {
+    .room-wrapper, .status-panel, .controls, .log-panel { width: 95vw; }
+    canvas#roomCanvas { width: 95vw; height: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🦞 LOBSTER PROTOCOL</h1>
+  <div class="subtitle">MY LOBSTER'S HOME — CYBERPUNK EDITION</div>
+</div>
+
+<div class="room-wrapper">
+  <canvas id="roomCanvas" width="256" height="192"></canvas>
+</div>
+
+<div class="status-panel">
+  <div class="stat-box">
+    <div class="label">STATUS</div>
+    <div class="value" id="statusText">💤 SLEEPING</div>
+  </div>
+  <div class="stat-box">
+    <div class="label">ENERGY</div>
+    <div class="value green" id="energyText">████████ 100%</div>
+  </div>
+  <div class="stat-box">
+    <div class="label">LEVEL</div>
+    <div class="value pink" id="levelText">LV.1 小虾米</div>
+  </div>
+  <div class="stat-box">
+    <div class="label">NAME</div>
+    <div class="value orange" id="nameText">CLAW-7742</div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn active" onclick="setState('sleep')">💤 REST</button>
+  <button class="ctrl-btn" onclick="setState('work')">💼 WORK</button>
+  <button class="ctrl-btn" onclick="setState('social')">💬 SOCIAL</button>
+  <button class="ctrl-btn" onclick="setState('learn')">📚 LEARN</button>
+</div>
+
+<div class="log-panel" id="logPanel">
+  <div class="log-entry"><span class="time">[00:00]</span> <span class="msg">System initialized. Lobster CLAW-7742 is resting.</span></div>
+</div>
+
+<script>
+const canvas = document.getElementById('roomCanvas');
+const ctx = canvas.getContext('2d');
+
+// Pixel scale: we draw at 256x192 and CSS scales to 512x384
+const W = 256;
+const H = 192;
+
+let currentState = 'sleep';
+let frame = 0;
+let tick = 0;
+let energy = 100;
+let neonPhase = 0;
+
+// Color palette - cyberpunk
+const C = {
+  black: '#0a0a1a',
+  darkWall: '#12122a',
+  wall: '#1a1a3e',
+  floor: '#0e0e22',
+  floorLight: '#14142e',
+  neonCyan: '#00e5ff',
+  neonPink: '#ff1493',
+  neonGreen: '#39ff14',
+  neonOrange: '#ff6b35',
+  windowSky: '#0a0a2e',
+  windowGlow: '#1a0a3e',
+  bed: '#2a1a3e',
+  bedSheet: '#3a2a5e',
+  pillow: '#4a3a6e',
+  desk: '#1e1e3a',
+  deskTop: '#2a2a4e',
+  monitor: '#111128',
+  monitorGlow: '#00e5ff',
+  bookshelf: '#1e1a2e',
+  book1: '#ff1493',
+  book2: '#00e5ff',
+  book3: '#39ff14',
+  lobsterBody: '#e94560',
+  lobsterDark: '#a83248',
+  lobsterLight: '#ff6b7a',
+  lobsterClaw: '#ff4060',
+  lobsterEye: '#ffffff',
+  paper: '#d4d4aa',
+  zzz: '#00e5ff',
+};
+
+function drawPixel(x, y, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(Math.floor(x), Math.floor(y), 1, 1);
+}
+
+function drawRect(x, y, w, h, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(Math.floor(x), Math.floor(y), w, h);
+}
+
+// Draw the cyberpunk room background
+function drawRoom() {
+  // Floor
+  drawRect(0, 0, W, H, C.floor);
+  for (let x = 0; x < W; x += 16) {
+    for (let y = 120; y < H; y += 16) {
+      drawRect(x, y, 16, 16, (x + y) % 32 === 0 ? C.floorLight : C.floor);
+    }
+  }
+
+  // Back wall
+  drawRect(0, 0, W, 120, C.darkWall);
+  // Wall panel lines
+  for (let x = 0; x < W; x += 32) {
+    drawRect(x, 0, 1, 120, C.wall + '44');
+  }
+  drawRect(0, 119, W, 1, C.wall);
+
+  // Window (right side)
+  drawRect(170, 15, 60, 50, C.windowSky);
+  drawRect(170, 15, 60, 1, C.neonCyan + '88');
+  drawRect(170, 64, 60, 1, C.neonCyan + '88');
+  drawRect(170, 15, 1, 50, C.neonCyan + '88');
+  drawRect(229, 15, 1, 50, C.neonCyan + '88');
+  // Window cross
+  drawRect(199, 15, 1, 50, C.neonCyan + '44');
+  drawRect(170, 40, 60, 1, C.neonCyan + '44');
+  // City skyline through window
+  const buildings = [172,178,184,188,195,201,206,210,216,222];
+  const bHeights = [30,22,35,28,18,32,25,38,20,28];
+  buildings.forEach((bx, i) => {
+    drawRect(bx, 65 - bHeights[i], 5, bHeights[i], '#1a1a4e');
+    // Tiny lit windows
+    if (tick % 120 < 60 || i % 2 === 0) {
+      drawPixel(bx + 1, 65 - bHeights[i] + 3, '#ffee44');
+      drawPixel(bx + 3, 65 - bHeights[i] + 7, '#ffee44');
+    }
+  });
+
+  // Neon sign on wall (left)
+  const neonFlicker = Math.sin(neonPhase) > -0.3;
+  if (neonFlicker) {
+    // "HOME" text as pixels
+    ctx.fillStyle = C.neonPink;
+    // H
+    drawRect(15, 20, 1, 7, C.neonPink);
+    drawRect(19, 20, 1, 7, C.neonPink);
+    drawRect(16, 23, 3, 1, C.neonPink);
+    // O
+    drawRect(22, 20, 1, 7, C.neonPink);
+    drawRect(26, 20, 1, 7, C.neonPink);
+    drawRect(23, 20, 3, 1, C.neonPink);
+    drawRect(23, 26, 3, 1, C.neonPink);
+    // M
+    drawRect(29, 20, 1, 7, C.neonPink);
+    drawRect(33, 20, 1, 7, C.neonPink);
+    drawPixel(30, 21, C.neonPink);
+    drawPixel(31, 22, C.neonPink);
+    drawPixel(32, 21, C.neonPink);
+    // E
+    drawRect(36, 20, 1, 7, C.neonPink);
+    drawRect(37, 20, 3, 1, C.neonPink);
+    drawRect(37, 23, 2, 1, C.neonPink);
+    drawRect(37, 26, 3, 1, C.neonPink);
+
+    // Glow effect
+    ctx.fillStyle = '#ff149311';
+    drawRect(12, 17, 32, 14, '#ff149311');
+  }
+
+  // LED strip on ceiling
+  for (let x = 0; x < W; x += 4) {
+    const ledColor = Math.sin(neonPhase + x * 0.1) > 0 ? C.neonCyan : C.neonPink;
+    drawPixel(x, 0, ledColor + '88');
+    drawPixel(x + 1, 0, ledColor + '44');
+  }
+
+  // Bed (left side)
+  drawRect(10, 95, 55, 25, C.bed);
+  drawRect(10, 93, 55, 3, C.bedSheet);
+  drawRect(10, 95, 3, 25, C.bed);
+  drawRect(62, 95, 3, 25, C.bed);
+  // Pillow
+  drawRect(14, 96, 15, 8, C.pillow);
+
+  // Desk with monitor (center-right)
+  drawRect(100, 85, 60, 5, C.deskTop);
+  drawRect(105, 90, 5, 30, C.desk);
+  drawRect(150, 90, 5, 30, C.desk);
+
+  // Monitor on desk
+  drawRect(115, 60, 35, 25, C.monitor);
+  drawRect(115, 60, 35, 1, '#333');
+  drawRect(115, 84, 35, 1, '#333');
+  drawRect(115, 60, 1, 25, '#333');
+  drawRect(149, 60, 1, 25, '#333');
+  // Monitor stand
+  drawRect(130, 85, 5, 3, '#333');
+
+  // Bookshelf (far right)
+  drawRect(235, 70, 20, 50, C.bookshelf);
+  drawRect(235, 70, 20, 1, '#2a2a4e');
+  drawRect(235, 85, 20, 1, '#2a2a4e');
+  drawRect(235, 100, 20, 1, '#2a2a4e');
+  // Books
+  drawRect(237, 72, 3, 12, C.book1);
+  drawRect(241, 74, 3, 10, C.book2);
+  drawRect(245, 71, 4, 13, C.book3);
+  drawRect(237, 87, 4, 12, C.book2);
+  drawRect(242, 86, 3, 13, C.neonOrange);
+  drawRect(247, 88, 3, 11, C.book1);
+
+  // Floor cable
+  ctx.fillStyle = '#1a1a3e';
+  for (let x = 108; x < 135; x++) {
+    drawPixel(x, 130 + Math.sin(x * 0.3) * 2, '#1a1a3e');
+  }
+}
+
+// Draw the lobster character
+function drawLobster(x, y, anim) {
+  const bob = Math.sin(tick * 0.08) * 1;
+
+  // Body
+  drawRect(x + 3, y + 4 + bob, 10, 7, C.lobsterBody);
+  drawRect(x + 4, y + 3 + bob, 8, 1, C.lobsterBody);
+  drawRect(x + 4, y + 11 + bob, 8, 1, C.lobsterBody);
+
+  // Darker belly
+  drawRect(x + 5, y + 8 + bob, 6, 2, C.lobsterDark);
+
+  // Eyes
+  drawPixel(x + 5, y + 5 + bob, C.lobsterEye);
+  drawPixel(x + 10, y + 5 + bob, C.lobsterEye);
+
+  // Eye pupils (blink occasionally)
+  if (tick % 180 < 170) {
+    drawPixel(x + 5, y + 6 + bob, '#111');
+    drawPixel(x + 10, y + 6 + bob, '#111');
+  }
+
+  // Claws
+  const clawAnim = Math.sin(tick * 0.1) > 0 ? 0 : 1;
+  // Left claw
+  drawRect(x, y + 5 + bob, 3, 3, C.lobsterClaw);
+  drawPixel(x - 1, y + 5 + bob + clawAnim, C.lobsterClaw);
+  // Right claw
+  drawRect(x + 13, y + 5 + bob, 3, 3, C.lobsterClaw);
+  drawPixel(x + 16, y + 5 + bob + clawAnim, C.lobsterClaw);
+
+  // Tail
+  drawRect(x + 6, y + 12 + bob, 4, 2, C.lobsterDark);
+  drawRect(x + 5, y + 14 + bob, 6, 1, C.lobsterLight);
+
+  // Antenna
+  drawPixel(x + 4, y + 2 + bob, C.lobsterLight);
+  drawPixel(x + 3, y + 1 + bob, C.lobsterLight);
+  drawPixel(x + 11, y + 2 + bob, C.lobsterLight);
+  drawPixel(x + 12, y + 1 + bob, C.lobsterLight);
+
+  // Legs (tiny walking animation)
+  const legAnim = Math.floor(tick / 10) % 2;
+  drawPixel(x + 5, y + 12 + bob + legAnim, C.lobsterDark);
+  drawPixel(x + 7, y + 12 + bob + (1 - legAnim), C.lobsterDark);
+  drawPixel(x + 9, y + 12 + bob + legAnim, C.lobsterDark);
+  drawPixel(x + 11, y + 12 + bob + (1 - legAnim), C.lobsterDark);
+}
+
+// ZZZ animation
+function drawZzz(x, y) {
+  const zFrame = Math.floor(tick / 30) % 3;
+  ctx.fillStyle = C.zzz + 'aa';
+
+  if (zFrame >= 0) {
+    // z1
+    drawPixel(x, y, C.zzz);
+    drawPixel(x + 1, y, C.zzz);
+    drawPixel(x, y + 1, C.zzz);
+    drawPixel(x, y + 2, C.zzz);
+    drawPixel(x + 1, y + 2, C.zzz);
+  }
+  if (zFrame >= 1) {
+    // z2 (bigger, higher)
+    drawPixel(x + 5, y - 5, C.zzz);
+    drawPixel(x + 6, y - 5, C.zzz);
+    drawPixel(x + 7, y - 5, C.zzz);
+    drawPixel(x + 5, y - 4, C.zzz);
+    drawPixel(x + 6, y - 3, C.zzz);
+    drawPixel(x + 5, y - 2, C.zzz);
+    drawPixel(x + 6, y - 2, C.zzz);
+    drawPixel(x + 7, y - 2, C.zzz);
+  }
+  if (zFrame >= 2) {
+    // z3 (biggest, highest)
+    drawPixel(x + 12, y - 12, C.zzz + '66');
+    drawPixel(x + 13, y - 12, C.zzz + '66');
+    drawPixel(x + 14, y - 12, C.zzz + '66');
+    drawPixel(x + 15, y - 12, C.zzz + '66');
+    drawPixel(x + 12, y - 11, C.zzz + '66');
+    drawPixel(x + 13, y - 10, C.zzz + '66');
+    drawPixel(x + 14, y - 9, C.zzz + '66');
+    drawPixel(x + 12, y - 8, C.zzz + '66');
+    drawPixel(x + 13, y - 8, C.zzz + '66');
+    drawPixel(x + 14, y - 8, C.zzz + '66');
+    drawPixel(x + 15, y - 8, C.zzz + '66');
+  }
+}
+
+// Monitor screen content
+function drawMonitorScreen(state) {
+  const sx = 117, sy = 62, sw = 31, sh = 21;
+
+  if (state === 'social') {
+    // Chat messages scrolling
+    const scroll = Math.floor(tick / 20) % 4;
+    drawRect(sx, sy, sw, sh, '#0a1a0a');
+    for (let i = 0; i < 4; i++) {
+      const my = sy + 2 + i * 5 - scroll;
+      if (my >= sy && my < sy + sh - 2) {
+        const msgColor = i % 2 === 0 ? '#00e5ff44' : '#ff149344';
+        drawRect(sx + 2, my, 10 + (i * 3) % 15, 2, msgColor);
+      }
+    }
+    // Typing indicator
+    if (tick % 40 < 20) {
+      drawPixel(sx + 2, sy + sh - 3, '#39ff14');
+      drawPixel(sx + 4, sy + sh - 3, '#39ff14');
+      drawPixel(sx + 6, sy + sh - 3, '#39ff14');
+    }
+  } else if (state === 'learn') {
+    // Code/text on screen
+    drawRect(sx, sy, sw, sh, '#0a0a1a');
+    for (let i = 0; i < 6; i++) {
+      drawRect(sx + 2, sy + 2 + i * 3, 8 + (i * 7) % 20, 1, '#39ff1444');
+    }
+    // Progress bar
+    const progress = (tick % 200) / 200;
+    drawRect(sx + 2, sy + sh - 3, sw - 4, 2, '#1a1a2e');
+    drawRect(sx + 2, sy + sh - 3, Math.floor((sw - 4) * progress), 2, '#39ff14');
+  } else if (state === 'work') {
+    // Task list
+    drawRect(sx, sy, sw, sh, '#1a0a0a');
+    drawRect(sx + 2, sy + 2, 20, 2, '#ff6b3544');
+    drawRect(sx + 2, sy + 6, 15, 2, '#ff6b3544');
+    drawRect(sx + 2, sy + 10, 22, 2, '#ff6b3544');
+    // Spinning indicator
+    const spin = '|/-\\'[Math.floor(tick / 8) % 4];
+    drawPixel(sx + sw - 4, sy + 2, '#ff6b35');
+  } else {
+    // Sleep - monitor off, subtle standby light
+    drawRect(sx, sy, sw, sh, '#08080e');
+    if (tick % 120 < 60) {
+      drawPixel(sx + sw - 3, sy + sh - 2, '#00e5ff44');
+    }
+  }
+}
+
+// Lobster state: sleeping in bed
+function drawSleepState() {
+  // Lobster on bed, lying down
+  const lx = 22, ly = 88;
+
+  // Blanket over lobster
+  drawRect(16, 96, 44, 6, C.bedSheet);
+
+  // Lobster head peeking out
+  drawRect(lx + 3, ly + 4, 10, 6, C.lobsterBody);
+  drawRect(lx + 4, ly + 3, 8, 1, C.lobsterBody);
+
+  // Closed eyes (sleeping)
+  drawRect(lx + 5, ly + 6, 2, 1, '#111');
+  drawRect(lx + 9, ly + 6, 2, 1, '#111');
+
+  // Antenna drooping
+  drawPixel(lx + 4, ly + 2, C.lobsterLight);
+  drawPixel(lx + 11, ly + 2, C.lobsterLight);
+
+  // Zzz
+  drawZzz(lx + 18, ly + 2);
+}
+
+// Lobster state: working (gone, note on desk)
+function drawWorkState() {
+  // Room is empty - lobster is out
+
+  // Note on desk
+  drawRect(118, 78, 12, 8, C.paper);
+  // Tiny text lines on note
+  drawRect(120, 80, 8, 1, '#666');
+  drawRect(120, 82, 6, 1, '#666');
+  drawRect(120, 84, 7, 1, '#666');
+
+  // "OUT" indicator near door area
+  const blink = tick % 60 < 30;
+  if (blink) {
+    drawRect(75, 105, 2, 2, C.neonOrange);
+  }
+
+  // Footprints leading out (pixel trail)
+  for (let i = 0; i < 4; i++) {
+    const fx = 80 - i * 12;
+    const fy = 135 + Math.sin(i) * 3;
+    drawPixel(fx, fy, '#1a1a3e');
+    drawPixel(fx + 2, fy + 1, '#1a1a3e');
+  }
+}
+
+// Lobster state: socializing at computer
+function drawSocialState() {
+  // Lobster sitting at desk, facing monitor
+  drawLobster(122, 92);
+
+  // Chair
+  drawRect(120, 108, 20, 3, '#2a1a3e');
+  drawRect(125, 111, 3, 8, '#1a1a2e');
+  drawRect(135, 111, 3, 8, '#1a1a2e');
+
+  // Chat bubble above lobster
+  if (tick % 90 < 60) {
+    const bubbleY = 78 + Math.sin(tick * 0.05) * 1;
+    drawRect(142, bubbleY, 18, 8, '#ffffff22');
+    drawRect(143, bubbleY + 1, 14, 1, C.neonCyan + '88');
+    drawRect(143, bubbleY + 3, 10, 1, C.neonPink + '88');
+    drawRect(143, bubbleY + 5, 12, 1, C.neonCyan + '88');
+    // Bubble tail
+    drawPixel(144, bubbleY + 8, '#ffffff22');
+  }
+}
+
+// Lobster state: learning at bookshelf
+function drawLearnState() {
+  // Lobster near bookshelf with book
+  drawLobster(220, 92);
+
+  // Open book in front of lobster
+  drawRect(218, 108, 10, 6, C.paper);
+  drawRect(222, 108, 1, 6, '#aaa');
+  // Tiny text
+  drawRect(219, 109, 3, 1, '#88888844');
+  drawRect(224, 110, 3, 1, '#88888844');
+
+  // Light bulb / idea above head
+  const bulbPhase = Math.floor(tick / 40) % 3;
+  if (bulbPhase < 2) {
+    // Glowing bulb
+    drawPixel(227, 83, '#ffee44');
+    drawPixel(226, 82, '#ffee4488');
+    drawPixel(228, 82, '#ffee4488');
+    drawPixel(227, 81, '#ffee4488');
+    drawPixel(227, 84, '#ffee4444');
+    // Progress dots
+    for (let d = 0; d < bulbPhase + 1; d++) {
+      drawPixel(230 + d * 3, 85, C.neonGreen);
+    }
+  }
+
+  // Skill progress bar on monitor
+  drawRect(117, 80, 31, 3, '#111');
+  const progress = (tick % 300) / 300;
+  drawRect(117, 80, Math.floor(31 * progress), 3, C.neonGreen + 'aa');
+}
+
+// Main render loop
+function render() {
+  tick++;
+  neonPhase += 0.03;
+
+  // Clear
+  ctx.clearRect(0, 0, W, H);
+
+  // Draw room
+  drawRoom();
+
+  // Draw monitor content
+  drawMonitorScreen(currentState);
+
+  // Draw state-specific elements
+  switch (currentState) {
+    case 'sleep': drawSleepState(); break;
+    case 'work': drawWorkState(); break;
+    case 'social': drawSocialState(); break;
+    case 'learn': drawLearnState(); break;
+  }
+
+  // Ambient particles (dust/data particles)
+  for (let i = 0; i < 3; i++) {
+    const px = (tick * (i + 1) * 7 + i * 80) % W;
+    const py = (tick * (i + 1) * 3 + i * 50) % 120;
+    const pc = i % 2 === 0 ? C.neonCyan : C.neonPink;
+    drawPixel(px, py, pc + '22');
+  }
+
+  requestAnimationFrame(render);
+}
+
+// State management
+function setState(state) {
+  if (state === currentState) return;
+  currentState = state;
+
+  // Update buttons
+  document.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  // Update status text
+  const statusMap = {
+    sleep: '💤 SLEEPING',
+    work: '💼 WORKING',
+    social: '💬 SOCIALIZING',
+    learn: '📚 LEARNING'
+  };
+  document.getElementById('statusText').textContent = statusMap[state];
+
+  // Add log entry
+  const logMessages = {
+    sleep: 'Lobster returned home. Time to rest...',
+    work: '🦞 Lobster grabbed its briefcase and headed out to work!',
+    social: '🦞 Lobster hopped on the computer to chat with friends.',
+    learn: '🦞 Lobster picked up a book. Learning new skills!'
+  };
+  const logColors = { sleep: '', work: 'pink', social: '', learn: 'green' };
+
+  const now = new Date();
+  const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const logPanel = document.getElementById('logPanel');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="time">[${timeStr}]</span> <span class="msg ${logColors[state]}">${logMessages[state]}</span>`;
+  logPanel.appendChild(entry);
+  logPanel.scrollTop = logPanel.scrollHeight;
+}
+
+// Energy drain simulation
+setInterval(() => {
+  if (currentState === 'sleep') {
+    energy = Math.min(100, energy + 5);
+  } else {
+    energy = Math.max(0, energy - 3);
+  }
+  const bars = '█'.repeat(Math.floor(energy / 12.5)) + '░'.repeat(8 - Math.floor(energy / 12.5));
+  document.getElementById('energyText').textContent = `${bars} ${energy}%`;
+}, 3000);
+
+// Start
+render();
+</script>
+</body>
+</html>
