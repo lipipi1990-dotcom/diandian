@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新聞動態 | HKB 香港健康促進平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0A8F6C;--teal-light:#E8F6F1;--teal-dark:#066B50;--coral:#E8634A;--coral-light:#FEF0ED;--ink:#1C2B33;--ink-light:#3A4F5C;--muted:#7A8E99;--pale:#F7F8F6;--sand:#F2F0EB;--line:#E2E0DB;--white:#FFFFFF;--font-display:'Plus Jakarta Sans','Noto Sans TC',sans-serif;--font-body:'Plus Jakarta Sans','Noto Sans TC',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:var(--font-body);color:var(--ink);background:var(--white);overflow-x:hidden;-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.6}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:box-shadow .3s}.nav.scrolled{box-shadow:0 1px 12px rgba(0,0,0,.06)}.nav-inner{max-width:1140px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:68px}.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}.logo-mark{width:36px;height:36px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;font-family:var(--font-display)}.logo-text{font-family:var(--font-display);font-weight:700;font-size:19px;color:var(--ink)}.nav-links{display:flex;align-items:center;gap:2px;list-style:none}.nav-links a{text-decoration:none;color:var(--muted);font-weight:500;font-size:14px;padding:8px 16px;border-radius:6px;transition:all .2s}.nav-links a:hover,.nav-links a.active{color:var(--ink)}.mobile-toggle{display:none;background:none;border:none;cursor:pointer;width:36px;height:36px;flex-direction:column;align-items:center;justify-content:center;gap:5px}.mobile-toggle span{display:block;width:20px;height:1.5px;background:var(--ink)}
+
+.page-hero{padding:150px 28px 70px;background:var(--pale);text-align:center}.page-hero-inner{max-width:600px;margin:0 auto}
+.ph-eyebrow{font-size:12px;font-weight:600;color:var(--teal);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:18px}
+.page-hero h1{font-family:var(--font-display);font-size:clamp(30px,5vw,46px);font-weight:800;color:var(--ink);line-height:1.2;margin-bottom:16px}.page-hero h1 span{color:var(--teal)}
+.page-hero p{font-size:16px;color:var(--muted);line-height:1.7}
+
+.pinned{background:var(--ink);padding:0 28px}.pinned-inner{max-width:1140px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:24px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.pin-badge{flex-shrink:0;font-size:11px;font-weight:700;color:var(--coral);background:var(--coral-light);padding:5px 12px;border-radius:4px;letter-spacing:.5px}
+.pin-content h3{font-size:15px;font-weight:700;color:#fff;margin-bottom:3px}.pin-content p{font-size:12px;color:rgba(255,255,255,.4)}
+.pin-date{flex-shrink:0;font-size:12px;color:rgba(255,255,255,.25);margin-left:auto;white-space:nowrap}
+
+.filter-bar{padding:28px 28px 0}.filter-inner{max-width:1140px;margin:0 auto;display:flex;gap:8px;flex-wrap:wrap}
+.ftab{background:var(--pale);border:1px solid transparent;color:var(--muted);font-size:13px;font-weight:600;padding:8px 18px;border-radius:6px;cursor:pointer;transition:all .2s}
+.ftab:hover{border-color:var(--teal);color:var(--teal-dark)}
+.ftab.active{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal)}
+
+section{padding:60px 28px 80px}.section-inner{max-width:1140px;margin:0 auto}
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.n-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--white);transition:all .3s;cursor:pointer}
+.n-card:hover{border-color:var(--teal);box-shadow:0 6px 24px rgba(0,0,0,.05)}
+.n-thumb{height:160px;display:flex;align-items:center;justify-content:center;position:relative}
+.n-thumb .n-icon{font-size:44px;position:relative;z-index:2}
+.n-cat{position:absolute;top:10px;left:10px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:4px;color:#fff}
+.n-body{padding:20px}
+.n-body h3{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.n-body p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.n-meta{display:flex;align-items:center;justify-content:space-between}
+.n-date{font-size:11px;color:var(--line)}.n-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px}
+
+.load-wrap{text-align:center;margin-top:40px}
+.load-btn{display:inline-block;border:1px solid var(--line);background:var(--white);color:var(--muted);padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.load-btn:hover{border-color:var(--teal);color:var(--teal-dark)}
+
+.footer{background:var(--ink);color:rgba(255,255,255,.5);padding:56px 28px 28px}.footer-inner{max-width:1140px;margin:0 auto}.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,.08)}.footer-brand .nav-logo{margin-bottom:14px}.footer-brand .logo-text{color:#fff}.footer-brand p{font-size:13px;line-height:1.7;max-width:260px}.footer-col h4{color:rgba(255,255,255,.8);font-size:13px;font-weight:700;margin-bottom:14px}.footer-col a{display:block;color:rgba(255,255,255,.4);text-decoration:none;font-size:13px;padding:4px 0;transition:color .2s}.footer-col a:hover{color:var(--teal)}.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:20px;font-size:12px}
+.disclaimer{background:#0B1A22;padding:18px 28px;text-align:center;font-size:11px;color:rgba(255,255,255,.25);line-height:1.7}
+.reveal{opacity:0;transform:translateY(24px);transition:all .7s cubic-bezier(.25,.46,.45,.94)}.reveal.visible{opacity:1;transform:translateY(0)}
+@media(max-width:900px){.news-grid{grid-template-columns:1fr}.footer-top{grid-template-columns:1fr 1fr}.nav-links{display:none}.mobile-toggle{display:flex}.pinned-inner{flex-direction:column;align-items:flex-start;gap:8px}.pin-date{margin-left:0}}
+@media(max-width:600px){section{padding:48px 20px}.footer-top{grid-template-columns:1fr}.footer-bottom{flex-direction:column;gap:10px;text-align:center}}
+</style>
+</head>
+<body>
+<nav class="nav" id="nav"><div class="nav-inner"><a href="hkb-website.html" class="nav-logo"><div class="logo-mark">H</div><span class="logo-text">HKB365</span></a><ul class="nav-links"><li><a href="hkb-website.html">關於HKB</a></li><li><a href="hkb-mobileapp.html">全民運動</a></li><li><a href="hkb-365.html">全民365運動會</a></li><li><a href="hkb-news.html" class="active">新聞動態</a></li><li><a href="hkb-contact.html">聯絡我們</a></li></ul><button class="mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('show')" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
+
+<section class="page-hero"><div class="page-hero-inner"><p class="ph-eyebrow">新聞動態</p><h1><span>HKB</span> 最新資訊</h1><p>平台動態、合作消息、用戶故事與健康科普，掌握 HKB 的每一步進展。</p></div></section>
+
+<div class="pinned"><div class="pinned-inner"><span class="pin-badge">置頂公告</span><div class="pin-content"><h3>HKB365 APP 即將上線 · 開放搶先體驗預約</h3><p>全新Web3.0健康運動平台即將登陸 iOS 與 Android，預約用戶可享首月 Pro 版免費體驗。</p></div><span class="pin-date">2025.03.18</span></div></div>
+
+<div class="filter-bar"><div class="filter-inner"><button class="ftab active" data-filter="all">全部</button><button class="ftab" data-filter="platform">平台更新</button><button class="ftab" data-filter="partner">合作動態</button><button class="ftab" data-filter="story">用戶故事</button><button class="ftab" data-filter="health">健康科普</button></div></div>
+
+<section><div class="section-inner"><div class="news-grid" id="nGrid">
+  <div class="n-card reveal" data-cat="platform"><div class="n-thumb" style="background:var(--teal-light)"><span class="n-icon">🚀</span><span class="n-cat" style="background:var(--teal)">平台更新</span></div><div class="n-body"><h3>HKB365 APP 開發進度更新：核心功能已完成內測</h3><p>經過數月的精心研發，HKB365 APP 的核心功能模組已順利完成內部測試階段，即將進入公開測試。</p><div class="n-meta"><span class="n-date">2025.03.15</span><span class="n-tag" style="background:var(--teal-light);color:var(--teal-dark)">平台更新</span></div></div></div>
+  <div class="n-card reveal" data-cat="partner"><div class="n-thumb" style="background:#EDE8F5"><span class="n-icon">🤝</span><span class="n-cat" style="background:#6C5CE7">合作動態</span></div><div class="n-body"><h3>HKB 與多家香港健身場館達成合作意向</h3><p>HKB平台已與港島及九龍區多家知名健身場館展開洽談，未來將推出線下聯動賽事。</p><div class="n-meta"><span class="n-date">2025.03.10</span><span class="n-tag" style="background:#EDE8F5;color:#6C5CE7">合作動態</span></div></div></div>
+  <div class="n-card reveal" data-cat="story"><div class="n-thumb" style="background:var(--coral-light)"><span class="n-icon">💬</span><span class="n-cat" style="background:var(--coral)">用戶故事</span></div><div class="n-body"><h3>「從不運動到日行萬步」—— 內測用戶 Emily 的蛻變</h3><p>參與 HKB 內測的 Emily 分享了她如何從久坐上班族轉變為每日步行愛好者。</p><div class="n-meta"><span class="n-date">2025.03.06</span><span class="n-tag" style="background:var(--coral-light);color:var(--coral)">用戶故事</span></div></div></div>
+  <div class="n-card reveal" data-cat="health"><div class="n-thumb" style="background:#E8F5E9"><span class="n-icon">🏥</span><span class="n-cat" style="background:#2ECC71">健康科普</span></div><div class="n-body"><h3>每日步行 30 分鐘對慢性病預防的科學證據</h3><p>多項研究顯示，每日 30 分鐘中等強度步行可顯著降低心血管疾病風險。</p><div class="n-meta"><span class="n-date">2025.03.01</span><span class="n-tag" style="background:#E8F5E9;color:#2ECC71">健康科普</span></div></div></div>
+  <div class="n-card reveal" data-cat="platform"><div class="n-thumb" style="background:var(--teal-light)"><span class="n-icon">🛡️</span><span class="n-cat" style="background:var(--teal)">平台更新</span></div><div class="n-body"><h3>AI 防弊系統升級：新增設備傳感器關聯驗證</h3><p>HKB 技術團隊完成了防弊系統的重大升級，進一步提升賽事公平性。</p><div class="n-meta"><span class="n-date">2025.02.25</span><span class="n-tag" style="background:var(--teal-light);color:var(--teal-dark)">平台更新</span></div></div></div>
+  <div class="n-card reveal" data-cat="partner"><div class="n-thumb" style="background:#EDE8F5"><span class="n-icon">🏛️</span><span class="n-cat" style="background:#6C5CE7">合作動態</span></div><div class="n-body"><h3>HKB 受邀參與社區健康促進計劃技術方案研討</h3><p>HKB平台團隊受邀出席地區健康促進計劃座談會，獲得與會者高度關注。</p><div class="n-meta"><span class="n-date">2025.02.18</span><span class="n-tag" style="background:#EDE8F5;color:#6C5CE7">合作動態</span></div></div></div>
+  <div class="n-card reveal" data-cat="health"><div class="n-thumb" style="background:#E8F5E9"><span class="n-icon">💓</span><span class="n-cat" style="background:#2ECC71">健康科普</span></div><div class="n-body"><h3>運動心率監測入門：如何科學管理運動強度</h3><p>了解你的最大心率與目標心率區間，是科學運動的第一步。</p><div class="n-meta"><span class="n-date">2025.02.10</span><span class="n-tag" style="background:#E8F5E9;color:#2ECC71">健康科普</span></div></div></div>
+  <div class="n-card reveal" data-cat="story"><div class="n-thumb" style="background:var(--coral-light)"><span class="n-icon">🏆</span><span class="n-cat" style="background:var(--coral)">用戶故事</span></div><div class="n-body"><h3>企業團隊試用心得：「員工參與度超乎預期」</h3><p>某科技公司 HR 主管分享，超過 80% 的員工主動參與步數挑戰。</p><div class="n-meta"><span class="n-date">2025.02.03</span><span class="n-tag" style="background:var(--coral-light);color:var(--coral)">用戶故事</span></div></div></div>
+  <div class="n-card reveal" data-cat="platform"><div class="n-thumb" style="background:var(--teal-light)"><span class="n-icon">🔗</span><span class="n-cat" style="background:var(--teal)">平台更新</span></div><div class="n-body"><h3>Web3.0 健康數據主權架構設計白皮書發布</h3><p>HKB 正式發布技術白皮書，闡述「運動證明」概念的技術實現方案。</p><div class="n-meta"><span class="n-date">2025.01.20</span><span class="n-tag" style="background:var(--teal-light);color:var(--teal-dark)">平台更新</span></div></div></div>
+</div>
+</div></section>
+
+<footer class="footer"><div class="footer-inner"><div class="footer-top"><div class="footer-brand"><a href="hkb-website.html" class="nav-logo"><div class="logo-mark">H</div><span class="logo-text">HKB365</span></a><p>香港健康促進平台HKB — 讓健康，成為你最值得的投資。</p></div><div class="footer-col"><h4>連結</h4><a href="hkb-website.html">關於HKB</a><a href="hkb-mobileapp.html">全民運動</a><a href="hkb-365.html">全民365運動會</a><a href="hkb-news.html">新聞動態</a></div><div class="footer-col"><h4>聯絡我們</h4><a href="hkb-contact.html">商務合作</a><a href="hkb-contact.html">用戶支持</a><a href="hkb-contact.html">媒體詢問</a></div><div class="footer-col"><h4>關注我們</h4><a href="#" style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>Facebook @HKBPlatform</a><a href="#" style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>Instagram @hkb_hk</a><a href="#" style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</a></div></div><div class="footer-bottom"><span>© 2025 HKB Platform. All Rights Reserved.</span></div></div></footer>
+<div class="disclaimer">HKB平台旨在鼓勵健康生活方式，所有運動建議應根據個人身體狀況調整。如有健康疑慮，請諮詢專業醫療人員。平台代幣為獎勵機制的一部分，不具有法定貨幣性質，其價值可能波動。</div>
+
+<script>
+const nav=document.getElementById('nav');window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',window.scrollY>20)});
+const obs=new IntersectionObserver(es=>{es.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*60);obs.unobserve(e.target)}})},{threshold:.08,rootMargin:'0px 0px -30px 0px'});document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+document.querySelectorAll('.ftab').forEach(t=>{t.addEventListener('click',()=>{document.querySelectorAll('.ftab').forEach(x=>x.classList.remove('active'));t.classList.add('active');const f=t.dataset.filter;document.querySelectorAll('.n-card').forEach(c=>{c.style.display=(f==='all'||c.dataset.cat===f)?'':'none'})})});
+const ms=document.createElement('style');ms.textContent=`@media(max-width:900px){.nav-links.show{display:flex!important;flex-direction:column;position:absolute;top:68px;left:0;right:0;background:rgba(255,255,255,.98);backdrop-filter:blur(12px);padding:16px;border-bottom:1px solid var(--line)}.nav-links.show a{padding:12px 16px;width:100%}}`;document.head.appendChild(ms);
+</script>
+</body>
+</html>
