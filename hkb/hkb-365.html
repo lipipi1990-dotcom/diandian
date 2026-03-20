@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全民365運動會 | HKB 香港健康促進平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0A8F6C;--teal-light:#E8F6F1;--teal-dark:#066B50;--coral:#E8634A;--coral-light:#FEF0ED;--ink:#1C2B33;--ink-light:#3A4F5C;--muted:#7A8E99;--pale:#F7F8F6;--sand:#F2F0EB;--line:#E2E0DB;--white:#FFFFFF;--font-display:'Plus Jakarta Sans','Noto Sans TC',sans-serif;--font-body:'Plus Jakarta Sans','Noto Sans TC',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--ink);background:var(--white);overflow-x:hidden;-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.6}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:0 28px;transition:box-shadow .3s}.nav.scrolled{box-shadow:0 1px 12px rgba(0,0,0,.06)}
+.nav-inner{max-width:1140px;margin:0 auto;padding:0;display:flex;align-items:center;justify-content:space-between;height:68px}
+.nav-logo{display:flex;align-items:center;text-decoration:none}.footer-brand .logo-mark{max-height:52px;height:auto;width:auto;max-width:260px;object-fit:contain;display:block}.logo-text{font-family:var(--font-display);font-weight:700;font-size:19px;color:var(--ink)}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none}.nav-links a{text-decoration:none;color:var(--muted);font-weight:500;font-size:14px;padding:8px 16px;border-radius:6px;transition:all .2s}.nav-links a:hover,.nav-links a.active{color:var(--ink)}
+.mobile-toggle{display:none;background:none;border:none;cursor:pointer;width:36px;height:36px;flex-direction:column;align-items:center;justify-content:center;gap:5px}.mobile-toggle span{display:block;width:20px;height:1.5px;background:var(--ink)}
+
+.page-hero{padding:150px 28px 80px;background:var(--pale);text-align:center}.page-hero-inner{max-width:680px;margin:0 auto}
+.ph-eyebrow{font-size:12px;font-weight:600;color:var(--teal);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:18px}
+.page-hero h1{font-family:var(--font-display);font-size:clamp(30px,5vw,48px);font-weight:800;color:var(--ink);line-height:1.2;margin-bottom:18px}.page-hero h1 span{color:var(--teal)}
+.page-hero p{font-size:17px;color:var(--muted);line-height:1.8;max-width:560px;margin:0 auto}
+
+section{padding:100px 28px}.section-inner{max-width:1140px;margin:0 auto}
+.sec-eyebrow{font-size:12px;font-weight:600;color:var(--teal);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px}
+.sec-title{font-family:var(--font-display);font-size:clamp(26px,3.5vw,38px);font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:14px}
+.sec-desc{font-size:16px;color:var(--muted);line-height:1.8;max-width:560px;margin-bottom:48px}
+.text-center{text-align:center}.mx-auto{margin-left:auto;margin-right:auto}
+
+/* LIVE STATS */
+.live-stats{background:var(--ink);padding:36px 28px}
+.ls-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
+.ls-num{font-family:var(--font-display);font-size:clamp(26px,3.5vw,38px);font-weight:800;color:var(--teal);display:block}
+.ls-label{font-size:12px;color:rgba(255,255,255,.4);margin-top:4px}
+
+/* EVENT CARDS */
+.events{background:var(--white)}
+.ev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.ev-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:all .3s;background:var(--white)}
+.ev-card:hover{border-color:var(--teal);box-shadow:0 8px 28px rgba(0,0,0,.05)}
+.ev-banner{height:140px;display:flex;align-items:center;justify-content:center;position:relative}
+.ev-banner .ev-icon{font-size:44px;position:relative;z-index:2}
+.ev-badge{position:absolute;top:10px;left:10px;font-size:11px;font-weight:700;padding:4px 12px;border-radius:4px;color:#fff}
+.ev-body{padding:22px}
+.ev-body h3{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.ev-body .ev-date{font-size:12px;color:var(--muted);margin-bottom:14px}
+.ev-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px}
+.ev-stat{background:var(--pale);border-radius:8px;padding:8px 6px;text-align:center}
+.ev-stat .es-num{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--teal-dark);display:block}
+.ev-stat .es-label{font-size:10px;color:var(--muted)}
+.ev-progress{margin-bottom:12px}
+.ev-bar-bg{width:100%;height:5px;background:var(--sand);border-radius:3px;overflow:hidden}
+.ev-bar{height:100%;background:var(--teal);border-radius:3px}
+.ev-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+.ev-bar-label strong{color:var(--teal);font-weight:600}
+.ev-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;background:var(--teal-light);color:var(--teal-dark)}
+
+/* RACE TYPES */
+.race{background:var(--ink);color:#fff}
+.race .sec-title{color:#fff}.race .sec-desc{color:rgba(255,255,255,.45)}
+.race-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+.rc{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:32px 24px;transition:all .25s}
+.rc:hover{border-color:var(--teal);background:rgba(255,255,255,.03)}
+.rc h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.rc p{font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;margin-bottom:12px}
+.rc ul{list-style:none}.rc li{font-size:13px;color:rgba(255,255,255,.5);padding:3px 0 3px 16px;position:relative}.rc li::before{content:'';position:absolute;left:0;top:10px;width:4px;height:4px;border-radius:50%;background:var(--teal)}
+.rw-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:40px}
+.rw{border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:18px 14px;text-align:center;transition:all .25s}
+.rw:hover{border-color:var(--teal)}.rw h4{font-size:13px;font-weight:600;color:#fff;margin-bottom:2px}.rw p{font-size:11px;color:rgba(255,255,255,.3)}
+.trust{margin-top:32px;padding:16px 22px;border:1px solid rgba(10,143,108,.25);border-radius:10px;font-size:13px;color:rgba(255,255,255,.55);line-height:1.6}
+.trust strong{color:var(--teal)}
+
+/* JOIN STEPS */
+.join{background:var(--pale)}
+.join-row{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:center;max-width:920px;margin:0 auto}
+.j-card{border:1px solid var(--line);border-radius:12px;padding:36px 24px;text-align:center;background:var(--white);transition:all .3s}
+.j-card:hover{border-color:var(--teal)}
+.j-num{width:44px;height:44px;border-radius:50%;border:2px solid var(--teal);color:var(--teal);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:18px;font-weight:700;margin:0 auto 14px}
+.j-card h3{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.j-card p{font-size:14px;color:var(--muted)}
+.j-arrow{color:var(--line);font-size:24px;padding:0 10px}
+
+.val-strip{background:var(--sand);padding:22px 28px;text-align:center}
+.val-strip p{font-size:13px;color:var(--muted);letter-spacing:2px}
+
+.bottom-cta{background:var(--pale);text-align:center;padding:100px 28px}
+.bottom-cta h2{font-family:var(--font-display);font-size:clamp(24px,3.5vw,34px);font-weight:700;color:var(--ink);margin-bottom:14px}
+.bottom-cta>p{font-size:16px;color:var(--muted);margin-bottom:36px}
+.cs-box{display:inline-flex;flex-direction:column;align-items:center;gap:12px;border:1px dashed var(--line);border-radius:14px;padding:36px 52px;background:var(--white)}
+.cs-label{background:var(--coral);color:#fff;font-size:16px;font-weight:700;padding:10px 32px;border-radius:6px;letter-spacing:3px}
+.cs-note{font-size:13px;color:var(--muted)}
+.cs-stores{display:flex;gap:16px;margin-top:4px}
+.cs-store{border:1px solid var(--line);border-radius:8px;padding:10px 18px;font-size:13px;color:var(--muted)}
+
+.footer{background:var(--ink);color:rgba(255,255,255,.5);padding:56px 28px 28px}.footer-inner{max-width:1140px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,.08)}
+.footer-brand .nav-logo{margin-bottom:14px}.footer-brand p{font-size:13px;line-height:1.7;max-width:260px}
+.footer-col h4{color:rgba(255,255,255,.8);font-size:13px;font-weight:700;margin-bottom:14px}.footer-col a{display:block;color:rgba(255,255,255,.4);text-decoration:none;font-size:13px;padding:4px 0;transition:color .2s}.footer-col a:hover{color:var(--teal)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:20px;font-size:12px}
+.disclaimer{background:#0B1A22;padding:18px 28px;text-align:center;font-size:11px;color:rgba(255,255,255,.25);line-height:1.7}
+
+.reveal{opacity:0;transform:translateY(24px);transition:all .7s cubic-bezier(.25,.46,.45,.94)}.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:1024px){.ev-grid{grid-template-columns:1fr 1fr}.rw-row{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.ls-inner{grid-template-columns:1fr 1fr}.ev-grid,.race-grid{grid-template-columns:1fr}.join-row{grid-template-columns:1fr;gap:14px}.j-arrow{transform:rotate(90deg);padding:6px 0}.footer-top{grid-template-columns:1fr 1fr}.nav-links{display:none}.mobile-toggle{display:flex}.cs-stores{flex-direction:column;gap:8px}.cs-box{padding:28px 24px}}
+@media(max-width:600px){section{padding:64px 20px}.rw-row{grid-template-columns:1fr}.footer-top{grid-template-columns:1fr}.footer-bottom{flex-direction:column;gap:10px;text-align:center}}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav"><div class="nav-inner">
+  <a href="index.html" style="display:flex; align-items:center; gap:14px; text-decoration:none;"><img src="hkb-top-icon.png" width="52" height="52" alt="HKB365 香港健康促進平台" style="display:block;border-radius:14px;flex:0 0 auto;object-fit:contain;"><div style="height:52px; display:flex; flex-direction:column; justify-content:center; line-height:1.3;"><div style="font-size:22px; font-weight:800; color:#1a1a1a; letter-spacing:1px;">HKB365</div><div style="font-size:11px; color:#666; letter-spacing:0.5px;">香港健康促進平台</div></div></a>
+  <ul class="nav-links"><li><a href="hkb-website.html">關於HKB</a></li><li><a href="hkb-mobileapp.html">全民運動</a></li><li><a href="hkb-365.html" class="active">全民365運動會</a></li><li><a href="hkb-news.html">新聞動態</a></li><li><a href="hkb-contact.html">聯絡我們</a></li></ul>
+  <button class="mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('show')" aria-label="Menu"><span></span><span></span><span></span></button>
+</div></nav>
+
+<section class="page-hero"><div class="page-hero-inner"><p class="ph-eyebrow">全民365運動會</p><h1>你的每一步<br>都算「<span>數</span>」</h1><p>在這裡，每天都是賽場。實時數據跳動，豐厚獎勵兌現，加入全年無休的健康挑戰，讓運動創造看得見的價值。</p></div></section>
+
+<div class="live-stats"><div class="ls-inner">
+  <div><span class="ls-num" data-target="128536">0</span><span class="ls-label">累計參與總人次</span></div>
+  <div><span class="ls-num" data-target="2847">0</span><span class="ls-label">本週報名人數</span></div>
+  <div><span class="ls-num" data-target="56832410">0</span><span class="ls-label">累計總步數</span></div>
+  <div><span class="ls-num" data-target="365">0</span><span class="ls-label">全年無休 · 天</span></div>
+</div></div>
+
+<section class="events"><div class="section-inner">
+  <div class="reveal text-center"><p class="sec-eyebrow">實時火熱賽事</p><h2 class="sec-title">精彩賽事，等你挑戰</h2><p class="sec-desc mx-auto">多元賽事全年輪番上陣，從日常挑戰到主題聯賽，總有一場適合你。</p></div>
+  <div class="ev-grid">
+    <div class="ev-card reveal"><div class="ev-banner" style="background:linear-gradient(135deg,#E8F6F1,#d0ece4)"><span class="ev-icon">🏃</span><span class="ev-badge" style="background:var(--teal)">進行中</span></div><div class="ev-body"><h3>每週步數挑戰賽</h3><div class="ev-date">每週一 00:00 — 週日 23:59</div><div class="ev-stats"><div class="ev-stat"><span class="es-num" data-target="3842">0</span><span class="es-label">參賽人數</span></div><div class="ev-stat"><span class="es-num" data-target="12580000">0</span><span class="es-label">總步數</span></div><div class="ev-stat"><span class="es-num" data-target="5000">0</span><span class="es-label">獎金池</span></div></div><div class="ev-progress"><div class="ev-bar-bg"><div class="ev-bar" style="width:68%"></div></div><div class="ev-bar-label"><span>賽程進度</span><strong>68%</strong></div></div><span class="ev-tag">低門檻 · 保底獎勵</span></div></div>
+
+    <div class="ev-card reveal"><div class="ev-banner" style="background:linear-gradient(135deg,#FEF0ED,#f9ddd5)"><span class="ev-icon">⛰️</span><span class="ev-badge" style="background:var(--coral)">即將開始</span></div><div class="ev-body"><h3>春季登高挑戰賽</h3><div class="ev-date">2025.04.01 — 2025.04.30</div><div class="ev-stats"><div class="ev-stat"><span class="es-num" data-target="1256">0</span><span class="es-label">已報名</span></div><div class="ev-stat"><span class="es-num">—</span><span class="es-label">總步數</span></div><div class="ev-stat"><span class="es-num" data-target="20000">0</span><span class="es-label">獎金池</span></div></div><div class="ev-progress"><div class="ev-bar-bg"><div class="ev-bar" style="width:0%"></div></div><div class="ev-bar-label"><span>報名中</span><strong style="color:var(--coral)">即將開賽</strong></div></div><span class="ev-tag" style="background:var(--coral-light);color:var(--coral)">主題聯賽 · NFT勳章</span></div></div>
+
+    <div class="ev-card reveal"><div class="ev-banner" style="background:linear-gradient(135deg,#EDE8F5,#ddd6ef)"><span class="ev-icon">🏢</span><span class="ev-badge" style="background:#6C5CE7">企業專屬</span></div><div class="ev-body"><h3>企業健康杯團體賽</h3><div class="ev-date">2025.05.01 — 2025.05.31</div><div class="ev-stats"><div class="ev-stat"><span class="es-num" data-target="48">0</span><span class="es-label">參賽企業</span></div><div class="ev-stat"><span class="es-num" data-target="2400">0</span><span class="es-label">參賽人數</span></div><div class="ev-stat"><span class="es-num" data-target="50000">0</span><span class="es-label">獎金池</span></div></div><div class="ev-progress"><div class="ev-bar-bg"><div class="ev-bar" style="width:0%"></div></div><div class="ev-bar-label"><span>招募中</span><strong style="color:#6C5CE7">開放報名</strong></div></div><span class="ev-tag" style="background:#EDE8F5;color:#6C5CE7">企業ESG · 團隊競賽</span></div></div>
+  </div>
+</div></section>
+
+<section class="race"><div class="section-inner">
+  <div class="reveal text-center"><p class="sec-eyebrow" style="color:var(--teal)">賽事體系</p><h2 class="sec-title">全天候賽事，讓運動永不落幕</h2><p class="sec-desc mx-auto">從每日輕挑戰到年度大賽事，多元賽制滿足不同運動需求。</p></div>
+  <div class="race-grid">
+    <div class="rc reveal"><h3>每日 / 每週挑戰</h3><p>低門檻，保底獎勵，養成規律運動習慣。</p><ul><li>每天只需 2000 步即可參與</li><li>個人 / 團體步數排行榜</li><li>週週比賽週週送獎勵</li><li>連續完成累加獎勵加成</li></ul></div>
+    <div class="rc reveal"><h3>主題聯賽</h3><p>有故事性的特色賽事，吸引深度參與。</p><ul><li>春季登高賽、夏日暴走賽</li><li>企業健康杯、公益愛心跑</li><li>節日主題限時挑戰</li><li>完賽可獲得 NFT 紀念勳章</li></ul></div>
+    <div class="rc reveal"><h3>線下聯動賽</h3><p>線上數據 + 線下體驗，虛實結合。</p><ul><li>合作健身房定向挑戰</li><li>公園 / 社區健康促進活動</li><li>實體獎牌與數字勳章雙重收藏</li><li>企業團體健康競賽專屬方案</li></ul></div>
+  </div>
+  <div class="rw-row reveal"><div class="rw"><h4>基礎代幣獎勵</h4><p>按步數自動計算</p></div><div class="rw"><h4>成就勳章系統</h4><p>解鎖特殊健康成就</p></div><div class="rw"><h4>排行榜獎金池</h4><p>頂尖運動者額外獎勵</p></div><div class="rw"><h4>合作商家兌換</h4><p>代幣兌換商品與服務</p></div></div>
+  <div class="trust reveal">所有賽事均受 <strong>AI防作弊系統</strong> 保護，結合實時運動軌跡驗證、機器學習行為分析與設備傳感器關聯性驗證，確保公平公正。</div>
+</div></section>
+
+<section class="join"><div class="section-inner">
+  <div class="reveal text-center"><p class="sec-eyebrow">如何參與</p><h2 class="sec-title">3 步驟加入全民365運動會</h2><p class="sec-desc mx-auto">簡單三步，即刻開啟你的競賽之旅。</p></div>
+  <div class="join-row reveal">
+    <div class="j-card"><div class="j-num">1</div><h3>下載 HKB365 APP</h3><p>支持 iOS 與 Android</p></div>
+    <div class="j-arrow">→</div>
+    <div class="j-card"><div class="j-num" style="border-color:var(--ink-light);color:var(--ink-light)">2</div><h3>選擇你的賽事</h3><p>進入首頁選擇【365運動會】</p></div>
+    <div class="j-arrow">→</div>
+    <div class="j-card"><div class="j-num" style="border-color:var(--coral);color:var(--coral)">3</div><h3>點擊【參加】</h3><p>開始運動，累積步數與獎勵！</p></div>
+  </div>
+</div></section>
+
+<div class="val-strip"><p>Web3.0運動激勵 · 運動數據資產化 · 健康與獎勵兼得</p></div>
+
+<section class="bottom-cta"><h2>立即下載，探索所有賽事</h2><p>加入全民365運動會，讓每一步都創造價值</p><div class="cs-box"><div class="cs-label">敬 請 期 待</div><p class="cs-note">APP即將上線，敬請關注最新動態</p><div class="cs-stores"><div class="cs-store">App Store · 即將推出</div><div class="cs-store">Google Play · 即將推出</div></div></div></section>
+
+<footer class="footer"><div class="footer-inner"><div class="footer-top"><div class="footer-brand"><a href="hkb-website.html" class="nav-logo"><img src="hkb-footer-logo.png" alt="HKB365 香港健康促進協會" class="logo-mark"></a><p>香港健康促進平台HKB — 讓健康，成為你最值得的投資。</p></div><div class="footer-col"><h4>連結</h4><a href="hkb-website.html">關於HKB</a><a href="hkb-mobileapp.html">全民運動</a><a href="hkb-365.html">全民365運動會</a></div><div class="footer-col"><h4>聯絡我們</h4><a href="hkb-contact.html">商務合作</a><a href="hkb-contact.html">用戶支持</a><a href="hkb-contact.html">媒體詢問</a></div><div class="footer-col"><h4>關注我們</h4><a href="#" style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>Facebook @HKBPlatform</a><a href="#" style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>Instagram @hkb_hk</a><a href="#" style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>香港健康促進平台HKB</a></div></div><div class="footer-bottom"><span>© 2026 HKB Platform. All Rights Reserved.</span></div></div></footer>
+<div class="disclaimer">HKB平台旨在鼓勵健康生活方式，所有運動建議應根據個人身體狀況調整。如有健康疑慮，請諮詢專業醫療人員。平台代幣為獎勵機制的一部分，不具有法定貨幣性質，其價值可能波動。</div>
+
+<script>
+const nav=document.getElementById('nav');window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',window.scrollY>20)});
+const obs=new IntersectionObserver(es=>{es.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*60);obs.unobserve(e.target)}})},{threshold:.08,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+function animC(){document.querySelectorAll('[data-target]').forEach(el=>{const t=parseInt(el.dataset.target);if(!t)return;const s=performance.now();(function u(n){const p=Math.min((n-s)/2000,1);el.textContent=Math.floor((1-Math.pow(1-p,3))*t).toLocaleString();if(p<1)requestAnimationFrame(u)})(s)})}
+const sObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){animC();sObs.unobserve(e.target)}})},{threshold:.3});
+const ls=document.querySelector('.live-stats');if(ls)sObs.observe(ls);
+const ms=document.createElement('style');ms.textContent=`@media(max-width:900px){.nav-links.show{display:flex!important;flex-direction:column;position:absolute;top:68px;left:0;right:0;background:rgba(255,255,255,.98);backdrop-filter:blur(12px);padding:16px;border-bottom:1px solid var(--line)}.nav-links.show a{padding:12px 16px;width:100%}}`;document.head.appendChild(ms);
+</script>
+</body>
+</html>
